@@ -19,8 +19,8 @@ from numpy import matrix
 ServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # 本地机器名
-host = "113.54.211.59"   # 真机测试
-# host = "127.0.0.1"    模拟器测试
+host = "113.54.211.59"                                           # 真机测试
+# host = "127.0.0.1"                                             # 模拟器测试
 
 
 # 设置端口
@@ -31,6 +31,9 @@ BUFSIZE = 1024
 
 # 传输的数据是否带有合磁场强度,4表示有，3表示只有X轴、Y轴、Z轴
 TRANDATALEN = 4
+
+# 保存数据的文件路径
+path = r'D:\TestFile\t1.csv'
 
 '''
 功能：将从Android客户端读取到的数据分割成X轴、Y轴、Z轴、合磁场
@@ -45,10 +48,10 @@ def split_string(str, mag_value):
     print("tem_data2")
     print(tem_data2)
     for i in range(len(tem_data2)):
-        # tem_data2[i] = float(Decimal(tem_data2[i]).quantize(Decimal('0.000')))     # 保留小数点后3位，并将Decimal类型强制转换成float类型
-        tem_data2[i] = float(tem_data2[i])        # 将String类型强制转换成float类型
+        # tem_data2[i] = float(Decimal(tem_data2[i]).quantize(Decimal('0.000')))         # 保留小数点后3位，并将Decimal类型强制转换成float类型
+        tem_data2[i] = float(tem_data2[i])                                               # 将String类型强制转换成float类型
 
-    tem_data2 = np.mat(tem_data2)                   # 将list类型转换成matrix
+    tem_data2 = np.mat(tem_data2)                                                        # 将list类型转换成matrix
     row = int(tem_data2.shape[1]/TRANDATALEN)
     mag_value = np.zeros((row, TRANDATALEN))
     for i in range(row):
@@ -56,8 +59,8 @@ def split_string(str, mag_value):
     return mag_value
 
 
-ServerSocket.bind((host, port))    # 2.s.bind绑定本地地址到socket对象
-ServerSocket.listen(5)             # 3.s.listen监听地址端口，连接几个客户端
+ServerSocket.bind((host, port))                                                          # 2.s.bind绑定本地地址到socket对象
+ServerSocket.listen(5)                                                                   # 3.s.listen监听地址端口，连接几个客户端
 
 while True:
     # 4.s.accept阻塞接受链接请求，被动接受 TCP 客户端连接，一直等待直到连接到达（阻塞）
@@ -68,36 +71,29 @@ while True:
     clientsocket, addr = ServerSocket.accept()
     print("连接地址:%s" % str(addr))
 
-    flag1 = 1                      # 标志位，看数据保存文件csv是否第一次打开
+    flag1 = 1                                                                           # 标志位，看数据保存文件csv是否第一次打开
     while True:
-        flag2 = 1                  # 标志位，用以标志clientsocket是否被关闭
-        msg = "向客户端发送的本条消息".encode("utf-8")            # send()和recv()的数据格式都是bytes。
-        # clientsocket.send(msg)                                  # (str和bytes的相互转化，用encode()和decode(),或者用bytes()和str())
+        flag2 = 1                                                                       # 标志位，用以标志clientsocket是否被关闭
+        msg = "向客户端发送的本条消息".encode("utf-8")                                    # send()和recv()的数据格式都是bytes。
+        # clientsocket.send(msg)                                                        # (str和bytes的相互转化，用encode()和decode(),或者用bytes()和str())
         data = clientsocket.recv(BUFSIZE).decode("utf-8")
-        if not data:                    # 判断缓冲区是否还有数据，若没有，就关闭socket连接
+        if not data:                                                                    # 判断缓冲区是否还有数据，若没有，就关闭socket连接
             break
             flag2 = 0
             clientsocket.close()
 
-        mag_value = 0                   # 数组(4*1) ----保存X,Y,Z轴，合磁场强度
+        mag_value = 0                                                                   # 数组(4*1) ----保存X,Y,Z轴，合磁场强度
         mag_value = split_string(data, mag_value)
-        mag_value = pd.DataFrame(mag_value)
-        path = r'D:\TestFile\test.csv'
+        true_value = pd.DataFrame(mag_value)
         if flag1 == 1:
             flag1 = 0
-            mag_value.to_csv(path, header=['X', 'Y', 'Z', 'Aggre'], index=False)    # 带有Aggre表示合磁场强度
-            # mag_value.to_csv(path, header=['X', 'Y', 'Z'], index=False)      # 只有X轴、Y轴、Z轴，没有合磁场强度
+            true_value.to_csv(path, header=['X', 'Y', 'Z', 'Aggre'], index=False)       # 带有Aggre表示合磁场强度
+            # mag_value.to_csv(path, header=['X', 'Y', 'Z'], index=False)               # 只有X轴、Y轴、Z轴，没有合磁场强度
         else:
-            mag_value.to_csv(path, header=False, index=False, mode='a+')
+            true_value.to_csv(path, header=False, index=False, mode='a+')
 
-
-        # print(type(data))
         print(data)
 
-        # print(mag_value)
-        # data1 = ('[%s]' % (ctime())).encode("utf-8")
-        # clientsocket.send(data1)
-        # clientsocket.settimeout(20)
     if flag2 == 1:
         clientsocket.close()
 
