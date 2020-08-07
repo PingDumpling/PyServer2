@@ -33,7 +33,7 @@ BUFSIZE = 1024
 TRANDATALEN = 4
 
 # 保存数据的文件路径
-path = r'D:\TestFile\t1.csv'
+path = r'D:\TestFile\Douyin.csv'
 
 '''
 功能：将从Android客户端读取到的数据分割成X轴、Y轴、Z轴、合磁场
