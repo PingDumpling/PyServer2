@@ -6,10 +6,10 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-path = r'D:\TestFile\AfterDeleteWeChatText.csv'
+path = r'D:\TestFile\zhihu.csv'
 
 # 采样频率,F的值表示1s多少个点
-F = 8
+F = 50
 
 
 def compute_x_axis_time(mag_value):
