@@ -9,7 +9,7 @@ win_interval_stride = 0.16                                   # 帧步幅 每间�
 NFFT = 512                                                   # 傅里叶变换所用参数
 sample_rate = 50
 win_size = 2
-win_stride = 0.5
+win_stride = 1
 
 
 def divide_win_interval(mag_aggr):
@@ -49,29 +49,44 @@ def fft_trans(mag_matrix):
     return mag_pow
 
 
+def pca_bulid_feature(mag_pow):
+    '''
+    :param mag_pow: fft后的频谱结果
+    :return:
+    '''
+
+
+
 path = r"D:\TestFile\douyinwithlabel.csv"
 csv_data = read_data_from_csv(path)
 mag_value = csv_data[:, 3]
 
-win_len, win_step = win_size * sample_rate, win_stride * sample_rate
+win_len = win_size * sample_rate
+win_step = win_stride * sample_rate
 win_len = int(round(win_len))
 win_step = int(round(win_step))
 num_len = mag_value.shape[0]
 num_win = 1 + int(np.ceil(float(np.abs(num_len - win_len)) / win_step))
-pad_signal_length = num_win * win_step + win_len                                       # 反过来计算分帧后的一维数组数据总数
-z = np.zeros((pad_signal_length - num_len))                                            # 多余的数据用0填充，生成一个全0元素矩阵
-pad_signal = np.append(mag_value, z)
+pad_len = num_win * win_step + win_len                                       # 反过来计算分帧后的一维数组数据总数
+z = np.zeros((pad_len - num_len))                                            # 多余的数据用0填充，生成一个全0元素矩阵
+pad_mag = np.append(mag_value, z)
+win = []
 
-# for i in range(num_win):
+for i in range(num_win):
+    if i == 0:
+        win[i] = pad_mag[:win_len-1]
+    else:
+        win[i] = pad_mag[i*win_step:i*win_step+win_len-1]
+    mag_matrix = divide_win_interval(win[i])
+    add_window(mag_matrix, win_interval_size * sample_rate)
+    mag_pow = fft_trans(mag_matrix)
 
-win0 = mag_value[:win_len-1]
 
 
-mag_matrix = divide_win_interval(win0)
-add_window(mag_matrix, win_interval_size * sample_rate)
-mag_pow = fft_trans(mag_matrix)
-print(type(mag_pow))
-print(mag_pow.shape)
+
+
+
+
 
 
 
