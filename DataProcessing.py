@@ -38,8 +38,8 @@ def normalization(mag_aggr):
     return mag_norm
 
 
-path1 = r"D:\TestFile\douyin.csv"
-path2 = r"D:\TestFile\afterdataprocessing_douyin.csv"
+path1 = r"D:\TestFile\zhihu.csv"
+path2 = r"D:\TestFile\afterdataprocessing_zhihu.csv"
 raw_data = read_data_from_csv(path1)
 raw_x = raw_data[:, 0]                                          # 把x轴的值取出来
 centralization(raw_x)

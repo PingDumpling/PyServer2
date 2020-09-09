@@ -5,7 +5,7 @@
 from AddLabel import *                                 # 从本项目的其他python文件中导入函数、类、接口
 
 
-path = r"D:\TestFile\douyinwithlabel.csv"
+path = r"D:\TestFile\zhihuwithfeatureandlabel.csv"
 merge_path = r"D:\TestFile\merge.csv"
 
 def merge_csv(path1, path2):
@@ -17,6 +17,6 @@ def merge_csv(path1, path2):
     data1 = read_data_from_csv(path1)
     data2 = read_data_from_csv(path2)
     data1 = np.r_[data1, data2]
-    save_data_to_csv(path1, data1)
+    save_data_with_label_to_csv(path1, data1)
 
 merge_csv(merge_path, path);

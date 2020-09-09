@@ -19,7 +19,7 @@ from numpy import matrix
 ServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # 本地机器名
-host = "113.54.211.59"                                           # 真机测试
+host = "172.17.52.65"                                           # 真机测试
 # host = "127.0.0.1"                                             # 模拟器测试
 
 
@@ -30,10 +30,10 @@ port = 8765
 BUFSIZE = 1024
 
 # 传输的数据是否带有合磁场强度,4表示有，3表示只有X轴、Y轴、Z轴
-TRANDATALEN = 4
+TRANDATALEN = 3
 
 # 保存数据的文件路径
-path = r'D:\TestFile\Douyin.csv'
+path = r'D:\TestFile\doyin.csv'
 
 '''
 功能：将从Android客户端读取到的数据分割成X轴、Y轴、Z轴、合磁场
@@ -87,8 +87,8 @@ while True:
         true_value = pd.DataFrame(mag_value)
         if flag1 == 1:
             flag1 = 0
-            true_value.to_csv(path, header=['X', 'Y', 'Z', 'Aggre'], index=False)       # 带有Aggre表示合磁场强度
-            # mag_value.to_csv(path, header=['X', 'Y', 'Z'], index=False)               # 只有X轴、Y轴、Z轴，没有合磁场强度
+            # true_value.to_csv(path, header=['X', 'Y', 'Z', 'Aggre'], index=False)       # 带有Aggre表示合磁场强度
+            true_value.to_csv(path, header=['X', 'Y', 'Z'], index=False)               # 只有X轴、Y轴、Z轴，没有合磁场强度
         else:
             true_value.to_csv(path, header=False, index=False, mode='a+')
 

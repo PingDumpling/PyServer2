@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from AddLabel import *
+from sklearn.decomposition import PCA
 
 
 win_interval_size = 0.32                                     # window_interval大小32ms为一个时间间隔
@@ -10,6 +11,8 @@ NFFT = 512                                                   # 傅里叶变换�
 sample_rate = 50
 win_size = 2
 win_stride = 1
+FEATURE = 12
+LABEL = 3                                                   # douyin的标签为0，taobao的标签是1，kugou的标签是2，zhihu的标签是3
 
 
 def divide_win_interval(mag_aggr):
@@ -49,16 +52,18 @@ def fft_trans(mag_matrix):
     return mag_pow
 
 
-def pca_bulid_feature(mag_pow):
+def pca_bulid_feature(x):
     '''
-    :param mag_pow: fft后的频谱结果
-    :return:
+    :param x: fft后的频谱结果
+    :return: pca后的降维数据x
     '''
+    pca =PCA(n_components=FEATURE)
+    reduced_x = pca.fit_transform(x)
+    return reduced_x
 
 
-
-path = r"D:\TestFile\douyinwithlabel.csv"
-csv_data = read_data_from_csv(path)
+path1 = r"D:\TestFile\afterdataprocessing_douyin.csv"
+csv_data = read_data_from_csv(path1)
 mag_value = csv_data[:, 3]
 
 win_len = win_size * sample_rate
@@ -70,16 +75,24 @@ num_win = 1 + int(np.ceil(float(np.abs(num_len - win_len)) / win_step))
 pad_len = num_win * win_step + win_len                                       # 反过来计算分帧后的一维数组数据总数
 z = np.zeros((pad_len - num_len))                                            # 多余的数据用0填充，生成一个全0元素矩阵
 pad_mag = np.append(mag_value, z)
+feature_vector = np.zeros((12*num_win, FEATURE))                             # 12是num_win_interval的值，也就是一个窗口划分的interval的数量
 win = []
 
 for i in range(num_win):
     if i == 0:
-        win[i] = pad_mag[:win_len-1]
+        win = pad_mag[:win_len-1]
     else:
-        win[i] = pad_mag[i*win_step:i*win_step+win_len-1]
-    mag_matrix = divide_win_interval(win[i])
+        win = pad_mag[i*win_step:i*win_step+win_len-1]
+    mag_matrix = divide_win_interval(win)
     add_window(mag_matrix, win_interval_size * sample_rate)
     mag_pow = fft_trans(mag_matrix)
+    pca_mag = pca_bulid_feature(mag_pow)
+    feature_vector[i*12:(i+1)*12] = pca_mag
+
+path2 = r"D:\TestFile\douyinwithfeatureandlabel.csv"
+feature_vector = add_label(feature_vector, LABEL)
+save_data_with_label_to_csv(path2, feature_vector)
+
 
 
 

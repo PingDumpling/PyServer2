@@ -23,11 +23,11 @@ def read_data_from_csv(path):
 def save_data_with_label_to_csv(path, data):
     '''
     :param path: 保存文件路径
-    :param data: ndarray,要保存的数据,带有标签
+    :param data: ndarray,要保存的数据(特征矩阵)带有标签
     :return:
     '''
     data = pd.DataFrame(data)
-    data.to_csv(path, header=['X', 'Y', 'Z', 'Aggre', 'Label'], index=False)
+    data.to_csv(path, index=False)
 
 
 def save_data_to_csv(path, data):
@@ -52,9 +52,9 @@ def add_label(data, y):
     return data
 
 
-data = read_data_from_csv(path1)
-data = add_label(data, Label)
-save_data_with_label_to_csv(path2, data)
+# data = read_data_from_csv(path1)
+# data = add_label(data, Label)
+# save_data_with_label_to_csv(path2, data)
 
 
 
