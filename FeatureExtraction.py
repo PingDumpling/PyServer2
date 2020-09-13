@@ -62,7 +62,7 @@ def pca_bulid_feature(x):
     return reduced_x
 
 
-path1 = r"D:\TestFile\afterdataprocessing_douyin.csv"
+path1 = r"D:\TestFile\afterdataprocessing_zhihu.csv"
 csv_data = read_data_from_csv(path1)
 mag_value = csv_data[:, 3]
 
@@ -89,7 +89,7 @@ for i in range(num_win):
     pca_mag = pca_bulid_feature(mag_pow)
     feature_vector[i*12:(i+1)*12] = pca_mag
 
-path2 = r"D:\TestFile\douyinwithfeatureandlabel.csv"
+path2 = r"D:\TestFile\zhihuwithfeatureandlabel.csv"
 feature_vector = add_label(feature_vector, LABEL)
 save_data_with_label_to_csv(path2, feature_vector)
 

@@ -19,7 +19,7 @@ from numpy import matrix
 ServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # 本地机器名
-host = "172.17.52.65"                                           # 真机测试
+host = "192.168.1.105"                                           # 真机测试
 # host = "127.0.0.1"                                             # 模拟器测试
 
 
@@ -33,7 +33,7 @@ BUFSIZE = 1024
 TRANDATALEN = 3
 
 # 保存数据的文件路径
-path = r'D:\TestFile\doyin.csv'
+path = r'D:\TestFile\zhihu.csv'
 
 '''
 功能：将从Android客户端读取到的数据分割成X轴、Y轴、Z轴、合磁场

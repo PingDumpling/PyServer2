@@ -52,7 +52,7 @@ aggr_mag_value = aggregation(raw_x, raw_y, raw_z)
 # print("归一化前：")
 # print(aggr_mag_value[:3])                                     # 输出前3行的数据
 norm_mag_value = normalization(aggr_mag_value)
-mag_aggr = np.zeros((raw_data.shape[0], raw_data.shape[1]))
+mag_aggr = np.zeros((raw_data.shape[0], raw_data.shape[1]+1))
 mag_aggr[:, 0] = raw_x
 mag_aggr[:, 1] = raw_y
 mag_aggr[:, 2] = raw_z
