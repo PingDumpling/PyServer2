@@ -91,7 +91,7 @@ def ClfKNN(x, y):
         x_train, x_test = x[train_index], x[test_index]
         y_train, y_test = y[train_index], y[test_index]
         # print('训练集数量:', x_train.shape, '测试集数量:', x_test.shape)  # 结果表明每次划分的数量
-        clf = KNeighborsClassifier(n_neighbors=1)  # 定义KNN分类器， 近邻的个数为3
+        clf = KNeighborsClassifier(n_neighbors=2)  # 定义KNN分类器， 近邻的个数为3
         clf.fit(x_train, y_train)  # 训练分类器
         y_hat = clf.predict(x_test)  # 预测测试集的类别
         cm = confusion_matrix(y_test, y_hat)  # 生成混淆矩阵 混淆矩阵的第一个值cm[0][0]表示实际为0类，预测为0类的样本数
@@ -108,7 +108,7 @@ def ClfKNN(x, y):
     recall(rec)
     f1score(f1_sco)
 
-path = r"D:\TestFile\merge.csv"
+path = r"D:\TestFile\WeChat\20200915\MergeWithFeatureAndLabel\merge.csv"
 data = read_data_from_csv(path)
 x = data[:, :12]
 y = data[:, 12]
@@ -116,8 +116,8 @@ y = data[:, 12]
 print("RF:")
 ClfRF(x, y)
 
-# print("KNN:")
-# ClfKNN(x, y)
+print("KNN:")
+ClfKNN(x, y)
 
 
 

@@ -9,10 +9,11 @@ win_interval_size = 0.32                                     # window_interval�
 win_interval_stride = 0.16                                   # 帧步幅 每间隔16ms取下一帧
 NFFT = 512                                                   # 傅里叶变换所用参数
 sample_rate = 50
-win_size = 2
-win_stride = 1
+win_size = 0.5
+win_stride = 0.25
 FEATURE = 12
 LABEL = 3                                                   # douyin的标签为0，taobao的标签是1，kugou的标签是2，zhihu的标签是3
+
 
 
 def divide_win_interval(mag_aggr):
@@ -62,7 +63,53 @@ def pca_bulid_feature(x):
     return reduced_x
 
 
-path1 = r"D:\TestFile\afterdataprocessing_zhihu.csv"
+def computatef(mag_array):  # 计算得到特征矩阵，rd是ndarray类型
+
+    # 计算特征
+    win_max = np.max(mag_array)  # 计算窗口内磁力计最大值,  l---length
+    win_min = np.min(mag_array)  # 计算窗口内磁力计最小值
+    win_mean = np.mean(mag_array)  # 计算窗口内磁力计平均长度
+    win_var = np.var(mag_array)  # 计算窗口内磁力计长度方差
+
+        # 计算包长度峰度
+    if win_var == 0:
+        win_kurt = 0
+    else:
+        win_kurt = np.mean((mag_array- win_mean) ** 4)/pow(win_var, 2)  # 计算包长度峰度
+        win_skew = np.mean((mag_array - win_mean) ** 3)   # 计算包长度偏斜度
+        # win_sum = np.sum(mag_array)   # 计算窗口内总的包长度
+
+        # 计算3个特殊位置，窗口大小的1/4把窗口分为两个部分，对两个部分分别计算包长度方差作为两个特征，同理，2/4处，3/4处，可得6个特征
+    if mag_array.shape[0] < 4:  # 判断窗口大小是否有3个位置
+        win1_4fmvar = 0
+        win1_4lavar = 0
+        win2_4fmvar = 0
+        win2_4lavar = 0
+        win3_4fmvar = 0
+        win3_4lavar = 0
+    else:  # 窗口大小有3个位置
+        t = mag_array.shape[0]//4
+        win1_4fm = mag_array[:t]  # 1/4的前边部分， fm---former,  pl---packet length
+        win1_4la = mag_array[t:]  # 1/4的后边部分,  la---latter
+        win2_4fm = mag_array[:t*2]
+        win2_4la = mag_array[t*2:]
+        win3_4fm = mag_array[:t*3]
+        win3_4la = mag_array[t*3:]
+        win1_4fmvar = np.var(win1_4fm)  # 计算1/4前边部分的方差
+        win1_4lavar = np.var(win1_4la)  # 计算1/4后边部分的方差
+        win2_4fmvar = np.var(win2_4fm)
+        win2_4lavar = np.var(win2_4la)
+        win3_4fmvar = np.var(win3_4fm)
+        win3_4lavar = np.var(win3_4la)
+
+    fvlm = np.asmatrix([win_max, win_min, win_mean, win_var, win_kurt, win_skew, win1_4fmvar, win1_4lavar, win2_4fmvar,
+                                win2_4lavar, win3_4fmvar, win3_4lavar])  # 将该窗口内的特征值组合为矩阵
+            # 如果是第一个窗口，则赋值给fv，否，则在fv后合并下一个窗口特征矩阵
+    return fvlm
+
+
+
+path1 = r"D:\TestFile\WeChat\20200915\VideoCall\afterdataprocessing.csv"
 csv_data = read_data_from_csv(path1)
 mag_value = csv_data[:, 3]
 
@@ -75,9 +122,11 @@ num_win = 1 + int(np.ceil(float(np.abs(num_len - win_len)) / win_step))
 pad_len = num_win * win_step + win_len                                       # 反过来计算分帧后的一维数组数据总数
 z = np.zeros((pad_len - num_len))                                            # 多余的数据用0填充，生成一个全0元素矩阵
 pad_mag = np.append(mag_value, z)
-feature_vector = np.zeros((12*num_win, FEATURE))                             # 12是num_win_interval的值，也就是一个窗口划分的interval的数量
+# feature_vector = np.zeros((12*num_win, FEATURE))                             # 12是num_win_interval的值，也就是一个窗口划分的interval的数量
+fv = np.zeros((num_win, 12))
 win = []
 
+'''
 for i in range(num_win):
     if i == 0:
         win = pad_mag[:win_len-1]
@@ -88,10 +137,20 @@ for i in range(num_win):
     mag_pow = fft_trans(mag_matrix)
     pca_mag = pca_bulid_feature(mag_pow)
     feature_vector[i*12:(i+1)*12] = pca_mag
+'''
 
-path2 = r"D:\TestFile\zhihuwithfeatureandlabel.csv"
-feature_vector = add_label(feature_vector, LABEL)
+for i in range(num_win):
+    if i == 0:
+        win = pad_mag[:win_len-1]
+    else:
+        win = pad_mag[i*win_step:i*win_step+win_len-1]
+    mag_array = win.reshape((-1, 1))  # 将一维数组转换成2维矩阵得到包长度矩阵m*1，  l---length
+    fv[i] = computatef(mag_array)
+
+path2 = r"D:\TestFile\WeChat\20200915\VideoCall\withfeatureandlabel.csv"
+feature_vector = add_label(fv, LABEL)
 save_data_with_label_to_csv(path2, feature_vector)
+
 
 
 
