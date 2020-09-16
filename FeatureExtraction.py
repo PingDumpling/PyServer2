@@ -9,8 +9,8 @@ win_interval_size = 0.32                                     # window_interval�
 win_interval_stride = 0.16                                   # 帧步幅 每间隔16ms取下一帧
 NFFT = 512                                                   # 傅里叶变换所用参数
 sample_rate = 50
-win_size = 0.5
-win_stride = 0.25
+win_size = 2
+win_stride = 0.5
 FEATURE = 12
 LABEL = 3                                                   # douyin的标签为0，taobao的标签是1，kugou的标签是2，zhihu的标签是3
 
