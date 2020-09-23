@@ -2,10 +2,10 @@ from AddLabel import *
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split, cross_validate, StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix,classification_report,accuracy_score,precision_score,recall_score,f1_score
+from sklearn.metrics import confusion_matrix, classification_report,accuracy_score,precision_score,recall_score,f1_score
 from sklearn.neighbors import KNeighborsClassifier
-
-
+import pickle
+import pandas as pd
 
 
 # clf = SVC()
@@ -47,23 +47,36 @@ def f1score(f1_sco):
     print('测试集的f1_score平均值为：%.4f' % np.mean(f1_sco))
     print()
 
-def ClfRF(x, y):
+
+def predict_to_csv(path, y_test, y_hat):
+    data = np.c_[y_test, y_hat]
+    data = pd.DataFrame(data)
+    data.to_csv(path, header=['y_test', 'y_hat'], index=False)
+
+def ClfRF_cv(x, y):
+    '''
+    :param x: 训练的特征数据
+    :param y: 训练的标签数据
+    :return:
+    explanation: 用x,y进行交叉验证一次来确定最好的模型超参数
+    '''
 
     acc = []  # 初始化acc
     f1_sco = []
     pre = []
     rec = []
     # x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=0)
-    skfold = StratifiedKFold(n_splits=5, shuffle=True)
+
+    skfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
     for train_index, test_index in skfold.split(x, y):  # 对数据建立5折交叉验证的划分
         # for test_index,train_index in New_sam.split(Sam):  #默认第一个参数是训练集，第二个参数是测试集
         x_train, x_test = x[train_index], x[test_index]
         y_train, y_test = y[train_index], y[test_index]
         # print('训练集数量:', x_train.shape, '测试集数量:', x_test.shape)  # 结果表明每次划分的数量
-        clf = RandomForestClassifier(n_estimators=215, max_features='log2')  # 定义随机森林分类器， 树的个数为50
+        clf = RandomForestClassifier(n_estimators=115, max_features='log2')  # 定义随机森林分类器， 树的个数为50
         clf.fit(x_train, y_train)  # 训练分类器
         y_hat = clf.predict(x_test)  # 预测测试集的类别
-        cm = confusion_matrix(y_test, y_hat)  # 生成混淆矩阵 混淆矩阵的第一个值cm[0][0]表示实际为0类，预测为0类的样本数
+        cm = confusion_matrix(y_test, y_hat, labels=[0, 1, 2])  # 生成混淆矩阵 混淆矩阵的第一个值cm[0][0]表示实际为0类，预测为0类的样本数
         # cm2[1][0]表示实际为1类，预测为0类的样本数
         # print(classification_report(y_test, y_hat, target_names=["browsing", "text", "voice", "video"],digits=2))
         # 假设标签1代表browsing、标签2代表text、标签3代表voice、标签4代表video digits可以设置小数点后保留的位数 默认是2
@@ -72,52 +85,111 @@ def ClfRF(x, y):
         pre.append(precision_score(y_test, y_hat, average='macro'))  # 宏平均（Macro-averaging）是指所有类别的每一个统计指标值的算数平均值
         rec.append(recall_score(y_test, y_hat, average='macro'))
         f1_sco.append(f1_score(y_test, y_hat, average='macro'))
+
     accuracy(acc)
     precision(pre)
     recall(rec)
     f1score(f1_sco)
 
+    '''
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=0, stratify=y)
 
-def ClfKNN(x, y):
+    clf = RandomForestClassifier(n_estimators=215, max_features='log2')  # 定义随机森林分类器， 树的个数为50
+    clf.fit(x_train, y_train)  # 训练分类器
 
-    acc = []  # 初始化acc
-    f1_sco = []
-    pre = []
-    rec = []
-    # x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=0)
-    skfold = StratifiedKFold(n_splits=5, shuffle=True)
-    for train_index, test_index in skfold.split(x, y):  # 对数据建立5折交叉验证的划分
-        # for test_index,train_index in New_sam.split(Sam):  #默认第一个参数是训练集，第二个参数是测试集
-        x_train, x_test = x[train_index], x[test_index]
-        y_train, y_test = y[train_index], y[test_index]
-        # print('训练集数量:', x_train.shape, '测试集数量:', x_test.shape)  # 结果表明每次划分的数量
-        clf = KNeighborsClassifier(n_neighbors=1)  # 定义KNN分类器， 近邻的个数为3
-        clf.fit(x_train, y_train)  # 训练分类器
-        y_hat = clf.predict(x_test)  # 预测测试集的类别
-        cm = confusion_matrix(y_test, y_hat)  # 生成混淆矩阵 混淆矩阵的第一个值cm[0][0]表示实际为0类，预测为0类的样本数
-        # cm2[1][0]表示实际为1类，预测为0类的样本数
-        # print(classification_report(y_test, y_hat, target_names=["browsing", "text", "voice", "video"],digits=2))
-        # 假设标签1代表browsing、标签2代表text、标签3代表voice、标签4代表video digits可以设置小数点后保留的位数 默认是2
-        # 准确率 正确分类的样本数 比上 总样本数
-        acc.append(accuracy_score(y_test, y_hat))  # 混淆矩阵对角线元素之和 比上 混淆矩阵所有元素和
-        pre.append(precision_score(y_test, y_hat, average='macro'))  # 宏平均（Macro-averaging）是指所有类别的每一个统计指标值的算数平均值
-        rec.append(recall_score(y_test, y_hat, average='macro'))
-        f1_sco.append(f1_score(y_test, y_hat, average='macro'))
-    accuracy(acc)
-    precision(pre)
-    recall(rec)
-    f1score(f1_sco)
+    y_pred = clf.predict(x_test)
+    cm = confusion_matrix(y_test, y_pred, labels=[0, 1, 2])  # 生成混淆矩阵 混淆矩阵的第一个值cm[0][0]表示实际为0类，预测为0类的样本数
+    print("混淆矩阵为：")
+    print(cm)
+    # cm2[1][0]表示实际为1类，预测为0类的样本数
+    # print(classification_report(y_test, y_hat, target_names=["browsing", "text", "voice", "video"],digits=2))
+    # 假设标签1代表browsing、标签2代表text、标签3代表voice、标签4代表video digits可以设置小数点后保留的位数 默认是2
+    # 准确率 正确分类的样本数 比上 总样本数
+    print("测试集的accuracy为：")
+    print(accuracy_score(y_test, y_pred))  # 混淆矩阵对角线元素之和 比上 混淆矩阵所有元素和
+    print("测试集的precision为：")
+    print(precision_score(y_test, y_pred, average='macro',
+                          zero_division='warn'))  # 宏平均（Macro-averaging）是指所有类别的每一个统计指标值的算数平均值
+    print("测试集的recall为：")
+    print(recall_score(y_test, y_pred, average='macro', zero_division='warn'))
+    print("测试集的f1_score为：")
+    print(f1_score(y_test, y_pred, average='macro', zero_division='warn'))
 
-path = r"D:\TestFile\WeChat\20200915\MergeWithFeatureAndLabel\merge_voice_voicecall_videocall.csv"
+    # path = r'D:\TestFile\WeChat\compare_y_testandy_hat\voice_voicecall.csv'
+    # predict_to_csv(path, y_test, y_hat)
+    '''
+    '''
+    with open(r'D:\TestFile\WeChat\20200916\model\svm_text_voice_voicecall.pickle', 'wb') as fw:
+        pickle.dump(clf, fw)
+        print("done")
+    '''
+
+def clf_rf_test(x_train, x_test, y_train, y_test):
+    clf = RandomForestClassifier(n_estimators=100, max_features='log2')
+    clf.fit(x_train, y_train)
+    y_pred = clf.predict(x_test)
+    cm = confusion_matrix(y_test, y_pred, labels=[0, 1, 2])
+    print("混淆矩阵为：")
+    print(cm)
+    print("测试集的accuracy为：")
+    print(accuracy_score(y_test, y_pred))  # 混淆矩阵对角线元素之和 比上 混淆矩阵所有元素和
+    print("测试集的precision为：")
+    print(precision_score(y_test, y_pred, average='macro',
+                          zero_division='warn'))  # 宏平均（Macro-averaging）是指所有类别的每一个统计指标值的算数平均值
+    print("测试集的recall为：")
+    print(recall_score(y_test, y_pred, average='macro', zero_division='warn'))
+    print("测试集的f1_score为：")
+    print(f1_score(y_test, y_pred, average='macro', zero_division='warn'))
+
+
+'''
+path = r"D:\TestFile\WeChat\20200916\MergeWithFeatureAndLabel\merge_text_voice.csv"
 data = read_data_from_csv(path)
-x = data[:, :12]
-y = data[:, 12]
-
+x_train = data[:, :12]
+y_train = data[:, 12]
 print("RF:")
-ClfRF(x, y)
+ClfRF_cv(x_train, y_train)
+'''
 
-# print("KNN:")
-# ClfKNN(x, y)
+
+path1 = r"C:\Users\Wen Ping\Desktop\20200916\Train\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
+path2 = r"C:\Users\Wen Ping\Desktop\20200916\Test\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
+data1 = read_data_from_csv(path1)
+x_train = data1[:, :12]
+y_train = data1[:, 12]
+y_train = y_train.astype(np.uint8)
+#ClfRF_cv(x_train, y_train)
+
+
+data2 = read_data_from_csv(path2)
+x_test = data2[:, :12]
+y_test = data2[:, 12]
+y_test = y_test.astype(np.uint8)
+#xx_train, xx_test, yy_train, yy_test = train_test_split(x_test, y_test, test_size=0.9, random_state=0, stratify=y_test)
+print("RF:")
+clf_rf_test(x_train, x_test, y_train, y_test)
+
+
+
+'''
+# 加载svm.pickle
+with open(r'D:\TestFile\WeChat\20200916\model\svm_text_voice_voicecall.pickle', 'rb') as fr:
+    new_svm = pickle.load(fr)
+    y_hat = new_svm.predict(x_test)
+    cm = confusion_matrix(y_test, y_hat)  # 生成混淆矩阵 混淆矩阵的第一个值cm[0][0]表示实际为0类，预测为0类的样本数
+    # cm2[1][0]表示实际为1类，预测为0类的样本数
+    # print(classification_report(y_test, y_hat, target_names=["browsing", "text", "voice", "video"],digits=2))
+    # 假设标签1代表browsing、标签2代表text、标签3代表voice、标签4代表video digits可以设置小数点后保留的位数 默认是2
+    # 准确率 正确分类的样本数 比上 总样本数
+    print("测试集的accuracy为：")
+    print(accuracy_score(y_test, y_hat))  # 混淆矩阵对角线元素之和 比上 混淆矩阵所有元素和
+    print("测试集的precision为：")
+    print(precision_score(y_test, y_hat, average='macro', zero_division='warn'))  # 宏平均（Macro-averaging）是指所有类别的每一个统计指标值的算数平均值
+    print("测试集的recall为：")
+    print(recall_score(y_test, y_hat, average='macro', zero_division='warn'))
+    print("测试集的f1_score为：")
+    print(f1_score(y_test, y_hat, average='macro', zero_division='warn'))
+'''
 
 
 

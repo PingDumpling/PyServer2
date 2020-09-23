@@ -10,9 +10,9 @@ win_interval_stride = 0.16                                   # 帧步幅 每间�
 NFFT = 512                                                   # 傅里叶变换所用参数
 sample_rate = 50
 win_size = 2
-win_stride = 0.5
+win_stride = 1
 FEATURE = 12
-LABEL = 3                                                   # douyin的标签为0，taobao的标签是1，kugou的标签是2，zhihu的标签是3
+LABEL = 0                                                   # douyin的标签为0，taobao的标签是1，kugou的标签是2，zhihu的标签是3
 
 
 
@@ -109,7 +109,7 @@ def computatef(mag_array):  # 计算得到特征矩阵，rd是ndarray类型
 
 
 
-path1 = r"D:\TestFile\WeChat\20200915\VideoCall\afterdataprocessing.csv"
+path1 = r"C:\Users\Wen Ping\Desktop\20200916\Test\Text\afterdataprocessing.csv"
 csv_data = read_data_from_csv(path1)
 mag_value = csv_data[:, 3]
 
@@ -147,7 +147,7 @@ for i in range(num_win):
     mag_array = win.reshape((-1, 1))  # 将一维数组转换成2维矩阵得到包长度矩阵m*1，  l---length
     fv[i] = computatef(mag_array)
 
-path2 = r"D:\TestFile\WeChat\20200915\VideoCall\withfeatureandlabel.csv"
+path2 = r"C:\Users\Wen Ping\Desktop\20200916\Test\Text\withfeatureandlabel.csv"
 feature_vector = add_label(fv, LABEL)
 save_data_with_label_to_csv(path2, feature_vector)
 

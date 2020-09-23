@@ -5,8 +5,8 @@
 from AddLabel import *                                 # 从本项目的其他python文件中导入函数、类、接口
 
 
-path = r"D:\TestFile\WeChat\20200915\VideoCall\withfeatureandlabel.csv"
-merge_path = r"D:\TestFile\WeChat\20200915\MergeWithFeatureAndLabel\merge_voice_voicecall_videocall.csv"
+path = r"C:\Users\Wen Ping\Desktop\20200916\Test\VoiceCall\withfeatureandlabel.csv"
+merge_path = r"C:\Users\Wen Ping\Desktop\20200916\Test\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
 
 def merge_csv(path1, path2):
     '''
