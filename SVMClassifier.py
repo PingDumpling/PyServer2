@@ -6,6 +6,7 @@ from sklearn.metrics import confusion_matrix, classification_report,accuracy_sco
 from sklearn.neighbors import KNeighborsClassifier
 import pickle
 import pandas as pd
+from ComputeConfusionMatrix import *
 
 
 # clf = SVC()
@@ -91,16 +92,24 @@ def ClfRF_cv(x, y):
     recall(rec)
     f1score(f1_sco)
 
+    # path = r'D:\TestFile\WeChat\compare_y_testandy_hat\voice_voicecall.csv'
+    # predict_to_csv(path, y_test, y_hat)
     '''
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=0, stratify=y)
+    with open(r'D:\TestFile\WeChat\20200916\model\svm_text_voice_voicecall.pickle', 'wb') as fw:
+        pickle.dump(clf, fw)
+        print("done")
+    '''
 
-    clf = RandomForestClassifier(n_estimators=215, max_features='log2')  # 定义随机森林分类器， 树的个数为50
+
+def clf_rf_split_train(x, y):
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=0, stratify=y)
+
+    clf = RandomForestClassifier(n_estimators=115, max_features='log2')  # 定义随机森林分类器， 树的个数为50
     clf.fit(x_train, y_train)  # 训练分类器
 
     y_pred = clf.predict(x_test)
-    cm = confusion_matrix(y_test, y_pred, labels=[0, 1, 2])  # 生成混淆矩阵 混淆矩阵的第一个值cm[0][0]表示实际为0类，预测为0类的样本数
-    print("混淆矩阵为：")
-    print(cm)
+    cm = confusion_matrix(y_test, y_pred)  # 生成混淆矩阵 混淆矩阵的第一个值cm[0][0]表示实际为0类，预测为0类的样本数
+    # cm = comp_conf_mat(y_test, y_pred)
     # cm2[1][0]表示实际为1类，预测为0类的样本数
     # print(classification_report(y_test, y_hat, target_names=["browsing", "text", "voice", "video"],digits=2))
     # 假设标签1代表browsing、标签2代表text、标签3代表voice、标签4代表video digits可以设置小数点后保留的位数 默认是2
@@ -115,20 +124,13 @@ def ClfRF_cv(x, y):
     print("测试集的f1_score为：")
     print(f1_score(y_test, y_pred, average='macro', zero_division='warn'))
 
-    # path = r'D:\TestFile\WeChat\compare_y_testandy_hat\voice_voicecall.csv'
-    # predict_to_csv(path, y_test, y_hat)
-    '''
-    '''
-    with open(r'D:\TestFile\WeChat\20200916\model\svm_text_voice_voicecall.pickle', 'wb') as fw:
-        pickle.dump(clf, fw)
-        print("done")
-    '''
 
 def clf_rf_test(x_train, x_test, y_train, y_test):
-    clf = RandomForestClassifier(n_estimators=100, max_features='log2')
+    clf = RandomForestClassifier(n_estimators=115, max_features='log2')
     clf.fit(x_train, y_train)
     y_pred = clf.predict(x_test)
     cm = confusion_matrix(y_test, y_pred, labels=[0, 1, 2])
+    # cm = comp_conf_mat(y_test, y_pred)
     print("混淆矩阵为：")
     print(cm)
     print("测试集的accuracy为：")
@@ -141,26 +143,21 @@ def clf_rf_test(x_train, x_test, y_train, y_test):
     print("测试集的f1_score为：")
     print(f1_score(y_test, y_pred, average='macro', zero_division='warn'))
 
-
 '''
-path = r"D:\TestFile\WeChat\20200916\MergeWithFeatureAndLabel\merge_text_voice.csv"
+path = r"D:\TestFile\WeChat\20200916\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
 data = read_data_from_csv(path)
-x_train = data[:, :12]
-y_train = data[:, 12]
+x = data[:, :12]
+y = data[:, 12]
 print("RF:")
-ClfRF_cv(x_train, y_train)
+clf_rf_split_train(x, y)
 '''
 
-
-path1 = r"C:\Users\Wen Ping\Desktop\20200916\Train\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
-path2 = r"C:\Users\Wen Ping\Desktop\20200916\Test\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
+path1 = r"C:\\Users\Wen Ping\Desktop\20200916\Train\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
+path2 = r"C:\\Users\Wen Ping\Desktop\20200916\Test\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
 data1 = read_data_from_csv(path1)
 x_train = data1[:, :12]
 y_train = data1[:, 12]
 y_train = y_train.astype(np.uint8)
-#ClfRF_cv(x_train, y_train)
-
-
 data2 = read_data_from_csv(path2)
 x_test = data2[:, :12]
 y_test = data2[:, 12]
