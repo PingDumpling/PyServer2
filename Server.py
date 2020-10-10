@@ -33,7 +33,7 @@ BUFSIZE = 1024
 TRANDATALEN = 3
 
 # 保存数据的文件路径
-path = r'D:\TestFile\WeChat\Browsing20200915_5.csv'
+path = r'D:\TestFile\WeChat\20200924\Text\15.csv'
 
 '''
 功能：将从Android客户端读取到的数据分割成X轴、Y轴、Z轴、合磁场

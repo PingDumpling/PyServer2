@@ -167,7 +167,6 @@ print("RF:")
 clf_rf_test(x_train, x_test, y_train, y_test)
 
 
-
 '''
 # 加载svm.pickle
 with open(r'D:\TestFile\WeChat\20200916\model\svm_text_voice_voicecall.pickle', 'rb') as fr:

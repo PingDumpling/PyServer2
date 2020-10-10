@@ -6,9 +6,9 @@ import numpy as np
 import pandas as pd
 
 
-path1 = r"D:\TestFile\douyin.csv"
-path2 = r"D:\TestFile\douyinwithlabel.csv"
-Label = 3
+path1 = r"C:\Users\14167\Desktop\CNNdata\test\voicecall.csv"
+path2 = r"C:\Users\14167\Desktop\CNNdata\test\voicecall.csv"
+Label = 2
 
 
 def read_data_from_csv(path):
