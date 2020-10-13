@@ -34,12 +34,13 @@ def normalization(mag_aggr):
     '''
     mag_norm = np.zeros((mag_aggr.shape[0], 1))
     for i in range(mag_aggr.shape[0]):
-        mag_norm[i] = (mag_aggr[i] - np.min(mag_aggr))/(np.max(mag_aggr) - np.min(mag_aggr))
+        # mag_norm[i] = (mag_aggr[i] - np.min(mag_aggr))/(np.max(mag_aggr) - np.min(mag_aggr))
+        mag_norm[i] = (mag_aggr[i] - np.mean(mag_aggr)) / np.std(mag_aggr)
     return mag_norm
 
-
-path1 = r"C:\Users\Wen Ping\Desktop\20200916\Test\VoiceCall\10.csv"
-path2 = r"C:\Users\Wen Ping\Desktop\20200916\Test\VoiceCall\afterdataprocessing_10.csv"
+'''
+path1 = r"C:\\Users\Wen Ping\Desktop\20200916\Test\VoiceCall\10.csv"
+path2 = r"C:\\Users\Wen Ping\Desktop\20200916\Test\VoiceCall\afterdataprocessing_10.csv"
 raw_data = read_data_from_csv(path1)
 raw_x = raw_data[:, 0]                                          # 把x轴的值取出来
 centralization(raw_x)
@@ -58,6 +59,6 @@ mag_aggr[:, 1] = raw_y
 mag_aggr[:, 2] = raw_z
 mag_aggr[:, 3] = norm_mag_value[:, 0]
 
-save_data_to_csv(path2, mag_aggr)
-
+# save_data_to_csv(path2, mag_aggr)
+'''
 

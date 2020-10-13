@@ -152,8 +152,8 @@ print("RF:")
 clf_rf_split_train(x, y)
 '''
 
-path1 = r"C:\\Users\Wen Ping\Desktop\20200916\Train\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
-path2 = r"C:\\Users\Wen Ping\Desktop\20200916\Test\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
+path1 = r"C:\Users\14167\Desktop\20200924\Train\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
+path2 = r"C:\Users\14167\Desktop\20200924\Test\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
 data1 = read_data_from_csv(path1)
 x_train = data1[:, :12]
 y_train = data1[:, 12]

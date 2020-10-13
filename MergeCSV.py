@@ -7,8 +7,8 @@ from AddLabel import *                                 # 从本项目的其他py
 
 # path = r"C:\Users\Wen Ping\Desktop\20200916\Test\VoiceCall\withfeatureandlabel.csv"
 # merge_path = r"C:\Users\Wen Ping\Desktop\20200916\Test\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
-path = r"C:\Users\14167\Desktop\CNNdata\test\voicecall.csv"
-merge_path = r"C:\Users\14167\Desktop\CNNdata\test\merge.csv"
+path = r"C:\Users\14167\Desktop\20200924\Test\VoiceCall\withfeatureandlabel.csv"
+merge_path = r"C:\Users\14167\Desktop\20200924\Test\MergeWithFeatureAndLabel\merge_text_voice_voicecall.csv"
 
 def merge_csv(path1, path2):
     '''

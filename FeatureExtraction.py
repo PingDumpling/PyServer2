@@ -3,6 +3,7 @@
 
 from AddLabel import *
 from sklearn.decomposition import PCA
+from DataProcessing import *
 
 
 win_interval_size = 0.32                                     # window_interval大小32ms为一个时间间隔
@@ -108,20 +109,25 @@ def computatef(mag_array):  # 计算得到特征矩阵，rd是ndarray类型
     return fvlm
 
 
-
-path1 = r"C:\Users\Wen Ping\Desktop\20200916\Test\VoiceCall\merge.csv"
+path1 = r"C:\Users\14167\Desktop\20200924\Test\VoiceCall\merge.csv"
 csv_data = read_data_from_csv(path1)
-mag_value = csv_data[:, 3]
+x_axis = csv_data[:, 0]
+y_axis = csv_data[:, 1]
+z_axis = csv_data[:, 2]
+
+# mag_value = csv_data[:, 3]                             # 如果在该文件前统一对所有的数据进行预处理
 
 win_len = win_size * sample_rate
 win_step = win_stride * sample_rate
 win_len = int(round(win_len))
 win_step = int(round(win_step))
-num_len = mag_value.shape[0]
+num_len = x_axis.shape[0]
 num_win = 1 + int(np.ceil(float(np.abs(num_len - win_len)) / win_step))
 pad_len = num_win * win_step + win_len                                       # 反过来计算分帧后的一维数组数据总数
 z = np.zeros((pad_len - num_len))                                            # 多余的数据用0填充，生成一个全0元素矩阵
-pad_mag = np.append(mag_value, z)
+pad_x = np.append(x_axis, z)
+pad_y = np.append(y_axis, z)
+pad_z = np.append(z_axis, z)
 # feature_vector = np.zeros((12*num_win, FEATURE))                             # 12是num_win_interval的值，也就是一个窗口划分的interval的数量
 fv = np.zeros((num_win, 12))
 win = []
@@ -141,13 +147,25 @@ for i in range(num_win):
 
 for i in range(num_win):
     if i == 0:
-        win = pad_mag[:win_len]
+        win_x = pad_x[:win_len]
+        win_y = pad_y[:win_len]
+        win_z = pad_z[:win_len]
     else:
-        win = pad_mag[i*win_step:i*win_step+win_len]
-    mag_array = win.reshape((-1, 1))  # 将一维数组转换成2维矩阵得到包长度矩阵m*1，  l---length
+        win_x = pad_x[i*win_step:i*win_step+win_len]
+        win_y = pad_y[i * win_step:i * win_step + win_len]
+        win_z = pad_z[i * win_step:i * win_step + win_len]
+
+    centralization(win_x)
+    centralization(win_y)
+    centralization(win_z)
+
+    win_mag_aggr = aggregation(win_x, win_y, win_z)
+    win_mag_norm = normalization(win_mag_aggr)
+
+    mag_array = win_mag_norm.reshape((-1, 1))  # 将一维数组转换成2维矩阵得到包长度矩阵m*1，  l---length
     fv[i] = computatef(mag_array)
 
-path2 = r"C:\Users\Wen Ping\Desktop\20200916\Test\VoiceCall\withfeatureandlabel.csv"
+path2 = r"C:\Users\14167\Desktop\20200924\Test\VoiceCall\withfeatureandlabel.csv"
 feature_vector = add_label(fv, LABEL)
 save_data_with_label_to_csv(path2, feature_vector)
 
